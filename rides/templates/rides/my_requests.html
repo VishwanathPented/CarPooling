@@ -1,0 +1,98 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Ride Requests</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Requests I've Sent</h3>
+        </div>
+        <div class="card-body">
+            {% if sent_requests %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ride</th>
+                                <th>Driver</th>
+                                <th>Departure</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in sent_requests %}
+                                <tr>
+                                    <td>{{ request.ride.start_location }} to {{ request.ride.end_location }}</td>
+                                    <td>{{ request.ride.driver.username }}</td>
+                                    <td>{{ request.ride.departure_time }}</td>
+                                    <td>
+                                        <span class="badge {% if request.status == 'PENDING' %}bg-warning{% elif request.status == 'ACCEPTED' %}bg-success{% elif request.status == 'REJECTED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ request.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>You haven't sent any ride requests yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h3>Requests I've Received</h3>
+        </div>
+        <div class="card-body">
+            {% if received_requests %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Ride</th>
+                                <th>Passenger</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in received_requests %}
+                                <tr>
+                                    <td>
+                                        <span class="text-primary">{{ request.ride.start_location }} to {{ request.ride.end_location }}</span><br>
+                                        <small class="text-muted">{{ request.ride.departure_time }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="text-success">{{ request.passenger.username }}</span><br>
+                                        <small class="text-muted">{{ request.passenger.email }}</small>
+                                    </td>
+                                    <td>{{ request.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge {% if request.status == 'PENDING' %}bg-warning text-dark{% elif request.status == 'ACCEPTED' %}bg-success{% elif request.status == 'REJECTED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ request.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if request.status == 'PENDING' %}
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'accept_request' request.id %}" class="btn btn-success btn-sm">Accept</a>
+                                                <a href="{% url 'reject_request' request.id %}" class="btn btn-danger btn-sm">Reject</a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>You haven't received any ride requests yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

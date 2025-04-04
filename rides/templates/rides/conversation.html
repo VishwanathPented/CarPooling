@@ -1,0 +1,169 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h3>Conversation with {{ other_user.username }}</h3>
+            <a href="{% url 'messages' %}" class="btn btn-outline-light btn-sm">Back to Messages</a>
+        </div>
+        <div class="card-body">
+            <!-- Location sharing modal -->
+            <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="locationModalLabel">Share Your Location</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="map" style="height: 300px; width: 100%;"></div>
+                            <p class="mt-2" id="location-status">Waiting for location...</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="share-location-btn">Share Location</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="message-container" id="message-container" style="height: 400px; overflow-y: auto;">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %} mb-3">
+                            <div class="card {% if message.sender == request.user %}bg-primary text-white float-end{% else %}bg-light float-start{% endif %}" style="max-width: 75%;">
+                                <div class="card-body py-2 px-3">
+                                    <p class="mb-0">{{ message.content }}</p>
+                                    <small class="text-{% if message.sender == request.user %}light{% else %}muted{% endif %}">
+                                        {{ message.timestamp|date:"M d, Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted my-5">
+                        <p>No messages yet. Start the conversation!</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="message-form mt-3">
+                <form id="message-form" data-recipient-id="{{ other_user.id }}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="message" class="form-control" placeholder="Type your message..." required>
+                        <button type="button" class="btn btn-outline-secondary" id="request-location-btn">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#locationModal">
+                            <i class="fas fa-share-location"></i> Share Location
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#meetupModal">
+                            <i class="fas fa-handshake"></i> Meetup Point
+                        </button>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Replace the Google Maps API script with a valid key format -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2B4A2C69-52D3-4EE8-B6D1-1F4880572325&callback=initMap" async defer></script>
+
+<!-- Add this new modal for meetup point selection -->
+<div class="modal fade" id="meetupModal" tabindex="-1" aria-labelledby="meetupModalLabel" aria-hidden="true">
+    <!-- Modal content remains unchanged -->
+</div>
+
+<script>
+    // Initialize map variable
+    let map;
+    let userMarker;
+    let currentPosition;
+    let meetupMap;
+    let meetupMarker;
+    let selectedMeetupPoint;
+    let geocoder;
+    
+    // Initialize map
+    function initMap() {
+        // Default location (can be updated when user shares location)
+        const defaultLocation = { lat: 40.7128, lng: -74.0060 }; // New York
+        
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: defaultLocation,
+            zoom: 15,
+        });
+        
+        userMarker = new google.maps.Marker({
+            position: defaultLocation,
+            map: map,
+            title: "Your Location"
+        });
+        
+        // Initialize the meetup map
+        meetupMap = new google.maps.Map(document.getElementById("meetup-map"), {
+            center: defaultLocation,
+            zoom: 15,
+        });
+        
+        meetupMarker = new google.maps.Marker({
+            position: null,
+            map: meetupMap,
+            title: "Meetup Point",
+            icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+        });
+        
+        // Initialize geocoder for address lookup
+        geocoder = new google.maps.Geocoder();
+        
+        // Add click listener to meetup map
+        meetupMap.addListener("click", function(event) {
+            placeMarker(event.latLng);
+        });
+    }
+    
+    // Function to place marker on meetup map
+    function placeMarker(location) {
+        meetupMarker.setPosition(location);
+        selectedMeetupPoint = {
+            lat: location.lat(),
+            lng: location.lng()
+        };
+        
+        document.getElementById("meetup-coordinates").textContent = 
+            `Latitude: ${selectedMeetupPoint.lat.toFixed(6)}, Longitude: ${selectedMeetupPoint.lng.toFixed(6)}`;
+        
+        // Enable the share button
+        document.getElementById("share-meetup-btn").disabled = false;
+        
+        // Show the details div
+        document.getElementById("meetup-details").classList.remove("d-none");
+        
+        // Get address for the selected location
+        geocoder.geocode({ 'location': location }, function(results, status) {
+            if (status === 'OK') {
+                if (results[0]) {
+                    document.getElementById("meetup-address").textContent = 
+                        `Address: ${results[0].formatted_address}`;
+                } else {
+                    document.getElementById("meetup-address").textContent = 
+                        "No address found for this location.";
+                }
+            } else {
+                document.getElementById("meetup-address").textContent = 
+                    `Geocoder failed due to: ${status}`;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Rest of your JavaScript code remains unchanged
+    });
+</script>
+{% endblock %}

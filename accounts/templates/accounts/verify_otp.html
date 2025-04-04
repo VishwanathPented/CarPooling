@@ -1,0 +1,27 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Email Verification</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-center">Please enter the 6-digit OTP sent to your email.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="text" name="otp" class="form-control form-control-lg text-center" 
+                               maxlength="6" pattern="\d{6}" required
+                               placeholder="Enter OTP">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Verify OTP</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

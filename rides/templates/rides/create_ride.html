@@ -1,0 +1,103 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #1c1c1c, #111);
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        padding: 30px;
+    }
+    .card {
+        background: #222;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+    }
+    .card-header {
+        background: #111;
+        color: red;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .card-body {
+        color: white;
+        padding: 25px;
+    }
+    label {
+        color: #ddd;
+        margin-bottom: 5px;
+    }
+    input, select, textarea {
+        background-color: #333 !important;
+        border: 1px solid #444 !important;
+        color: white !important;
+        border-radius: 5px !important;
+        padding: 8px 12px !important;
+        margin-bottom: 15px !important;
+    }
+    input:focus, select:focus, textarea:focus {
+        background-color: #444 !important;
+        border-color: red !important;
+        box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25) !important;
+        color: white !important;
+    }
+    .btn {
+        padding: 10px 20px;
+        background: red;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+    .btn:hover {
+        background: darkred;
+    }
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+        border: 1px solid rgba(220, 53, 69, 0.5);
+        border-radius: 5px;
+        padding: 8px 12px;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Create a Ride</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn">Create Ride</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

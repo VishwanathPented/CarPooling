@@ -1,0 +1,6 @@
+<!-- Look for something like this in your template -->
+<form method="post" action="{% url 'send_message' recipient.id %}">
+    {% csrf_token %}
+    <!-- form fields -->
+    <button type="submit">Send</button>
+</form>

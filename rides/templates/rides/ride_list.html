@@ -1,0 +1,83 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #1c1c1c, #111);
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        padding: 30px;
+    }
+    h2 {
+        color: white;
+        margin-bottom: 30px;
+    }
+    .card {
+        background: #222;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card-body {
+        color: white;
+    }
+    .card-title {
+        color: red;
+        font-weight: bold;
+    }
+    .btn {
+        padding: 10px 20px;
+        background: red;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+    .btn:hover {
+        background: darkred;
+    }
+</style>
+
+<div class="container">
+    <h2>Available Rides</h2>
+    <div class="row">
+        {% for ride in rides %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ ride.start_point }} to {{ ride.end_point }}</h5>
+                    <p class="card-text">
+                        <strong>Date:</strong> {{ ride.departure_time|date:"F d, Y" }}<br>
+                        <strong>Time:</strong> {{ ride.departure_time|time:"H:i" }}<br>
+                        <strong>Available Seats:</strong> {{ ride.seats_available }}<br>
+                        <strong>Driver:</strong> {{ ride.driver.username }}
+                    </p>
+                    {% if user != ride.driver %}
+                        <form method="post" action="{% url 'request_ride' ride.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Request Ride</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p>No rides available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

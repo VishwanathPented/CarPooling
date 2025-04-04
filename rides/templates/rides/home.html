@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #1c1c1c, #111);
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        padding: 30px;
+    }
+    .jumbotron {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+    }
+    .display-4 {
+        color: red;
+        font-weight: bold;
+    }
+    .lead {
+        color: #ddd;
+    }
+    .card {
+        background: #222;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s;
+        height: 100%;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card-header {
+        background: #111;
+        color: red;
+        font-weight: bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .card-body {
+        color: white;
+    }
+    .card-title {
+        color: red;
+        font-weight: bold;
+    }
+    .btn {
+        padding: 10px 20px;
+        background: red;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .btn:hover {
+        background: darkred;
+    }
+    .btn-success {
+        background: #28a745;
+    }
+    .btn-success:hover {
+        background: #218838;
+    }
+    .btn-info {
+        background: #17a2b8;
+    }
+    .btn-info:hover {
+        background: #138496;
+    }
+    .list-group-item {
+        background: #333;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .list-group-item-action:hover {
+        background: #444;
+        color: red;
+    }
+    .text-muted {
+        color: #aaa !important;
+    }
+    .badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+    .badge-success {
+        background-color: #28a745;
+    }
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .badge-danger {
+        background-color: #dc3545;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Welcome to Campus Carpool</h1>
+        <p class="lead">Share rides with your campus community - Save money, reduce emissions, and make connections!</p>
+        {% if user.is_authenticated %}
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Offer a Ride</h5>
+                            <p class="card-text">Share your journey with others</p>
+                            <a href="{% url 'create_ride' %}" class="btn">Create Ride</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Find a Ride</h5>
+                            <p class="card-text">Browse available rides</p>
+                            <a href="{% url 'ride_list' %}" class="btn btn-success">Search Rides</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">My Rides</h5>
+                            <p class="card-text">Manage your rides</p>
+                            <a href="{% url 'my_rides' %}" class="btn btn-info">View Rides</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn btn-lg mx-2">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-success btn-lg mx-2">Register</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Rides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for ride in recent_rides %}
+                        <a href="{% url 'request_ride' ride.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ ride.start_point }} → {{ ride.end_point }}</h6>
+                                <small>{{ ride.departure_time|date:"M d, Y" }}</small>
+                            </div>
+                            <small>{{ ride.seats_available }} seats available</small>
+                        </a>
+                        {% empty %}
+                        <p class="text-muted mb-0">No recent rides available</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Upcoming Rides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for request in my_requests %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ request.ride.start_point }} → {{ request.ride.end_point }}</h6>
+                                <span class="badge {% if request.status == 'ACCEPTED' %}badge-success{% elif request.status == 'PENDING' %}badge-warning{% else %}badge-danger{% endif %}">{{ request.status }}</span>
+                            </div>
+                            <small>{{ request.ride.departure_time|date:"M d, Y H:i" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted mb-0">No upcoming rides</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

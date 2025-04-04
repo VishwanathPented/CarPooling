@@ -1,0 +1,85 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<style>
+    .rating-container {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .rating-container input {
+        display: none;
+    }
+    
+    .rating-container label {
+        cursor: pointer;
+        font-size: 2.5rem;
+        color: #444;
+        transition: color 0.3s;
+        margin: 0 5px;
+    }
+    
+    .rating-container label:hover,
+    .rating-container label:hover ~ label,
+    .rating-container input:checked ~ label {
+        color: red;
+    }
+    
+    .comment-box {
+        background-color: #333;
+        color: white;
+        border: 1px solid #444;
+        border-radius: 5px;
+        padding: 10px;
+        width: 100%;
+        min-height: 100px;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Rate {{ user_to_rate.username }}</h2>
+                </div>
+                <div class="card-body">
+                    <p>How was your experience with {{ user_to_rate.username }} for the ride from {{ ride.start_point }} to {{ ride.end_point }}?</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="rating-container">
+                            <input type="radio" id="star5" name="rating" value="5" required />
+                            <label for="star5" title="5 stars">★</label>
+                            
+                            <input type="radio" id="star4" name="rating" value="4" />
+                            <label for="star4" title="4 stars">★</label>
+                            
+                            <input type="radio" id="star3" name="rating" value="3" />
+                            <label for="star3" title="3 stars">★</label>
+                            
+                            <input type="radio" id="star2" name="rating" value="2" />
+                            <label for="star2" title="2 stars">★</label>
+                            
+                            <input type="radio" id="star1" name="rating" value="1" />
+                            <label for="star1" title="1 star">★</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comments (optional)</label>
+                            <textarea id="comment" name="comment" class="comment-box"></textarea>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn">Submit Rating</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

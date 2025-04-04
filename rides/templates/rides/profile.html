@@ -1,0 +1,172 @@
+{% extends 'rides/base.html' %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #1c1c1c, #111);
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        padding: 30px;
+    }
+    .card {
+        background: #222;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+    }
+    .card-header {
+        background: #111 !important;
+        color: red !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-weight: bold;
+    }
+    .card-body {
+        color: white;
+    }
+    .user-avatar-lg {
+        background: red !important;
+        margin: 0 auto;
+    }
+    .profile-details label {
+        color: #aaa;
+    }
+    .profile-details p {
+        font-size: 1.1rem;
+    }
+    .text-muted {
+        color: #aaa !important;
+    }
+    .btn {
+        padding: 10px 20px;
+        background: red;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+    .btn:hover {
+        background: darkred;
+    }
+    .btn-outline-secondary {
+        background: transparent;
+        border: 1px solid #aaa;
+        color: white;
+    }
+    .btn-outline-secondary:hover {
+        background: #333;
+        color: red;
+    }
+    .alert {
+        background: #333;
+        border: 1px solid #ffc107;
+        color: white;
+    }
+    .ride-statistics .card {
+        background: #333;
+        transition: transform 0.3s;
+    }
+    .ride-statistics .card:hover {
+        transform: translateY(-5px);
+    }
+    .ride-statistics h5 {
+        color: #aaa;
+    }
+    .ride-statistics h2 {
+        color: red;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Profile</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            <div class="user-avatar-lg text-white rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                {{ user.username.0|upper }}
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h3>{{ user.get_full_name|default:user.username }}</h3>
+                            <p class="text-muted">Member since {{ user.date_joined|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-details">
+                        <h4 class="mb-3">Personal Information</h4>
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Username:</strong></label>
+                            <p>{{ user.username }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Email:</strong></label>
+                            <p>{{ user.email }}</p>
+                            {% if not user.email_verified %}
+                            <div class="alert alert-warning">
+                                Email not verified. Please check your inbox for verification link.
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Phone Number:</strong></label>
+                            <p>{{ user.phone_number|default:"Not provided" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Home Address:</strong></label>
+                            <p>{{ user.home_address|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="ride-statistics mt-4">
+                        <h4 class="mb-3">Ride Statistics</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Rides Offered</h5>
+                                        <h2 class="mb-0">{{ user.routes_as_driver.count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Rides Taken</h5>
+                                        <h2 class="mb-0">{{ user.routes_as_passenger.count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Rating</h5>
+                                        <h2 class="mb-0">4.5★</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+                        <a href="{% url 'change_password' %}" class="btn btn-outline-secondary">Change Password</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
