@@ -106,9 +106,9 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'carpool',  # Replace with your MongoDB database name
         'CLIENT': {
-            'host': 'mongodb+srv://your_username:your_password@cluster0.mongodb.net/?retryWrites=true&w=majority',
-            'username': 'root',
-            'password': 'Tejaa@2003',
+            'host': 'mongodb+srv://srk21srk12:W8cEFqDyrQrOahuy@cluster0.qpf38tp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+            'username': 'srk21srk12',
+            'password': 'W8cEFqDyrQrOahuy',
         }
     }
 }
