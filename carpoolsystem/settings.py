@@ -90,14 +90,26 @@ WSGI_APPLICATION = 'carpoolsystem.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'carpool',          # Your database name
+#         'USER': 'root',             # Your MySQL username
+#         'PASSWORD': 'Tejaa@2003',     # Your MySQL password
+#         'HOST': 'localhost',        # Your database host
+#         'PORT': '3306',             # MySQL default port
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'carpool',          # Your database name
-        'USER': 'root',             # Your MySQL username
-        'PASSWORD': 'Tejaa@2003',     # Your MySQL password
-        'HOST': 'localhost',        # Your database host
-        'PORT': '3306',             # MySQL default port
+        'ENGINE': 'djongo',
+        'NAME': 'carpool',  # Replace with your MongoDB database name
+        'CLIENT': {
+            'host': 'mongodb+srv://your_username:your_password@cluster0.mongodb.net/?retryWrites=true&w=majority',
+            'username': 'root',
+            'password': 'Tejaa@2003',
+        }
     }
 }
 
